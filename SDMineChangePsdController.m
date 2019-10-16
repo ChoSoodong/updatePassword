@@ -27,8 +27,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self addBackButtonAndMiddleTitle:@"修改密码" addBackBtn:YES isWhite:NO];
-    
     [self setupUI];
 }
 
@@ -125,50 +123,7 @@
  */
 -(void)updatePasswordData{
     
-    SDLoginModel *loginModel = [SDFileTool getObjectByFileName:LOGIN_MODEL];
-    if (IsEmptyObject(loginModel)) {
-        return;
-    }
-    
-    NSDictionary *params = @{
-                             @"userId"      : loginModel.id,
-                             @"oldPsd"      : self.oldPassView.inputTF.text,
-                             @"userNewPsd"  : self.newpassView.inputTF.text
-                             };
-    
-    WeakSelf;
-    [NetWorkTool POSTWithURL:API_UpdateUserPsd parameters:params cachePolicy:CachePolicyIgnoreCache callback:^(id responseObject, NSError *error) {
-        
-        if (error == nil) {
-            
-            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingMutableContainers error:nil];
-            
-            if ([dict[@"result"] boolValue]) {
-                
-                [EasyHUD showSuccessText:dict[@"msg"]];
-                
-                //更新用户数据
-                [SDGetUserInfoRequest getUserInfoDataByUserId:loginModel.id completion:^(SDLoginModel * _Nonnull loginModel) {
-                    
-                }];
-                
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [weakSelf.navigationController popViewControllerAnimated:YES];
-                });
-                
-            }else{
-                
-                [EasyHUD showErrorText:dict[@"msg"]];
-                
-            }
 
-        }else{
-            
-            [EasyHUD showText:@"网络异常,请重试"];
-        }
-        
-        
-    }];
 }
 
 @end
